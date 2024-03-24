@@ -4,6 +4,11 @@ import Input from "@/app/components/inputs/Input";
 import clsx from "clsx";
 import React, { useCallback, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import AuthSocialButton from "./AuthSocialButton";
+import { BsGithub, BsGoogle } from "react-icons/bs";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { signIn } from "next-auth/react";
 type Variant = "LOGIN" | "Register";
 
 function AuthForm() {
@@ -30,9 +35,23 @@ function AuthForm() {
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setIsLoading(true);
     if (Variant === "Register") {
-      //Axios register
-    } else if (Variant === "LOGIN") {
+      axios
+        .post("/api/register", data)
+        .catch((error) => toast.error("Something went wrong!"))
+        .finally(() => setIsLoading(false));
+    }
+    if (Variant === "LOGIN") {
       // Auth SignIn
+      signIn("credentials", { ...data, redirect: false })
+        .then((callback) => {
+          if (callback?.error) {
+            toast.error("Invalid credentials !");
+          }
+          if (callback?.ok && !callback?.error) {
+            toast.success("Logged in successfully");
+          }
+        })
+        .finally(() => setIsLoading(false));
     }
   };
   const socialAction = (action: string) => {
@@ -47,17 +66,19 @@ function AuthForm() {
             <Input label="name" register={register} id="name" errors={errors} />
           )}
           <Input
-            label="email"
+            label="email address"
             type="email"
             id="email"
             register={register}
             errors={errors}
+            disabled={IsLoading}
           />
           <Input
             label="password"
             type="password"
             id="password"
             register={register}
+            disabled={IsLoading}
             errors={errors}
           />
           <div>
@@ -78,7 +99,24 @@ function AuthForm() {
             </div>
           </div>
           <div className="mt-6 flex gap-2">
-            {/* <AuthSocialButton /> TODO:                 */}
+            <AuthSocialButton
+              icon={BsGithub}
+              onClick={() => socialAction("github")}
+            />
+            <AuthSocialButton
+              icon={BsGoogle}
+              onClick={() => socialAction("google")}
+            />
+          </div>
+        </div>
+        <div className="flex gap-2 justify-center text-sm mt-6 px-2 text-gray-500">
+          <div>
+            {Variant === "LOGIN"
+              ? "New to Messenger ?"
+              : "Already have an account ?"}
+          </div>
+          <div onClick={toggleVariant} className="underline cursor-pointer">
+            {Variant === "LOGIN" ? "Create An Account" : "Log In"}
           </div>
         </div>
       </div>
