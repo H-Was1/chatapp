@@ -67,7 +67,7 @@ function AuthForm() {
         .finally(() => setIsLoading(false));
     }
   };
-  const socialAction = (action: string) => {
+  const socialAction = (action: string) => { 
     setIsLoading(true);
     // NextAuth social signIn
     signIn(action, { redirect: false })

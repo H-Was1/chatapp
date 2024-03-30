@@ -1,12 +1,12 @@
 "use client";
 import React, { useCallback, useMemo } from "react";
-import format from "date-fns/format";
 import { fullConversationType } from "@/types";
 import useOtherUser from "@/hooks/useOtherUser";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import Avatar from "./Avatar";
+import { format } from "date-fns";
 
 interface boxProps {
   data: fullConversationType;
@@ -68,8 +68,7 @@ const ConversationBox: React.FC<boxProps> = ({ data, selected }) => {
             </p>
             {lastMessage?.createdAt && (
               <p className="text-xs text-gray-400 font-light">
-                {/* TODO: look for cause of the error after creating messages */}
-                {format(new Date(lastMessage.createdAt), "p")}
+                {format(new Date(lastMessage?.createdAt), "p")}
               </p>
             )}
           </div>
