@@ -1,6 +1,7 @@
 import { getCurrentUser } from "@/app/lib/action/getCurrentUser";
 import { NextResponse } from "next/server";
 import prisma from "@/app/lib/prismadb";
+import prismadb from "@/app/lib/prismadb";
 
 export async function POST(req: Request) {
   try {
@@ -33,7 +34,7 @@ export async function POST(req: Request) {
       });
       return NextResponse.json(newConversation);
     }
-    const existingConversations = await prisma.conversation.findMany({
+    const existingConversations = await prismadb.conversation.findMany({
       where: {
         OR: [
           {
@@ -53,7 +54,7 @@ export async function POST(req: Request) {
     if (singleConversation) {
       return NextResponse.json(singleConversation);
     }
-    const newConversation = await prisma.conversation.create({
+    const newConversation = await prismadb.conversation.create({
       data: {
         users: {
           connect: [{ id: currentUser.id }, { id: userId }],
