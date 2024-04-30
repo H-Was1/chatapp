@@ -14,8 +14,9 @@ export async function POST(req: Request) {
     if (isGroup && (!members || members.length < 2 || !name)) {
       return new NextResponse("Invalid data", { status: 400 });
     }
+
     if (isGroup) {
-      const newConversation = prismadb?.conversation.create({
+      const newConversation = await prismadb.conversation.create({
         data: {
           name,
           isGroup,
@@ -24,7 +25,9 @@ export async function POST(req: Request) {
               ...members.map((member: { value: string }) => ({
                 id: member.value,
               })),
-              { id: currentUser.id },
+              {
+                id: currentUser.id,
+              },
             ],
           },
         },
@@ -32,6 +35,7 @@ export async function POST(req: Request) {
           users: true,
         },
       });
+
       return NextResponse.json(newConversation);
     }
     const existingConversations = await prismadb.conversation.findMany({

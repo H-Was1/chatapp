@@ -1,6 +1,5 @@
 "use client";
 
-
 import { Conversation, User } from "@prisma/client";
 import { Fragment, useMemo, useState } from "react";
 import { format } from "date-fns";
@@ -9,21 +8,21 @@ import { IoClose, IoTrash } from "react-icons/io5";
 import ConfirmModal from "./ConfirmModal";
 import useOtherUser from "@/hooks/useOtherUser";
 import useActiveList from "@/app/lib/action/useActiveList";
-import AvatarGroup from "./AvatarGroup";
+import AvatarGroup from "../../../components/AvatarGroup";
 import Avatar from "@/app/(site)/components/Avatar";
 
 interface ProfileDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   data: Conversation & {
-    users: User[]
-  }
+    users: User[];
+  };
 }
 
 const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
   isOpen,
   onClose,
-  data
+  data,
 }) => {
   const otherUser = useOtherUser(data);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -31,7 +30,7 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
   const isActive = members.indexOf(otherUser?.email!) !== -1;
 
   const joinedDate = useMemo(() => {
-    return format(new Date(otherUser.createdAt), 'PP');
+    return format(new Date(otherUser.createdAt), "PP");
   }, [otherUser.createdAt]);
 
   const title = useMemo(() => {
@@ -43,7 +42,7 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
       return `${data.users.length} members`;
     }
 
-    return isActive ? 'Active' : 'Offline';
+    return isActive ? "Active" : "Offline";
   }, [data, isActive]);
 
   return (
@@ -87,7 +86,8 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
                 overflow-hidden
               "
             >
-              <div className="
+              <div
+                className="
                 pointer-events-none
                 fixed
                 inset-y-0
@@ -95,7 +95,8 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
                 flex
                 max-w-full
                 pl-10
-              ">
+              "
+              >
                 <Transition.Child
                   as={Fragment}
                   enter="transform transition ease-in-out duration-500"
@@ -123,19 +124,21 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
                       "
                     >
                       <div className="px-4 sm:px-6">
-                        <div 
+                        <div
                           className="
                             flex
                             items-start
                             justify-end
                           "
                         >
-                          <div className="
+                          <div
+                            className="
                             ml-3
                             flex
                             h-7
                             items-center
-                          ">
+                          "
+                          >
                             <button
                               onClick={onClose}
                               type="button"
@@ -156,14 +159,18 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
                           </div>
                         </div>
                       </div>
-                      <div className="
+                      <div
+                        className="
                         relative mt-6
                         flex-1 px-4
                         sm:px-6
-                      ">
-                        <div className="
+                      "
+                      >
+                        <div
+                          className="
                           flex flex-col items-center
-                        ">
+                        "
+                        >
                           <div className="mb-2">
                             {data.isGroup ? (
                               <AvatarGroup users={data.users} />
@@ -171,12 +178,12 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
                               <Avatar user={otherUser} />
                             )}
                           </div>
-                          <div>
-                            {title}
-                          </div>
-                          <div className="
+                          <div>{title}</div>
+                          <div
+                            className="
                             text-sm text-gray-500
-                          ">
+                          "
+                          >
                             {statusText}
                           </div>
                           <div className="flex gap-10 my-8">
@@ -253,7 +260,14 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
                                       sm:col-span-2
                                     "
                                   >
-                                    {data.users.map((user) => user.email).join(', ')}
+                                    {/* {data.users
+                                      .map((user) => user.email)
+                                      .join(", ")} */}
+                                    {data.users.map((user, i) => (
+                                      <p key={i + 1}>
+                                        {`${i + 1}: ` + user.email}
+                                      </p>
+                                    ))}
                                   </dd>
                                 </div>
                               )}
@@ -325,7 +339,7 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
         </Dialog>
       </Transition.Root>
     </>
-   );
-}
- 
+  );
+};
+
 export default ProfileDrawer;

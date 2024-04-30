@@ -5,7 +5,8 @@ import clsx from "clsx";
 import { format } from "date-fns/format";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
+import ImageModal from "./ImageModal";
 
 interface Props {
   data: fullMessageType;
@@ -19,6 +20,7 @@ const MessageBox: React.FC<Props> = ({ data, isLast }) => {
     .filter((user) => user.email !== data.sender.email)
     .map((user) => user.name)
     .join(", ");
+  const [imageModalOpen, setImageModalOpen] = useState(false);
   // ----------------- clsx ---------------------------------------
 
   const container = clsx("flex gap-3 p-4", isOwn && "justify-end");
@@ -45,12 +47,18 @@ const MessageBox: React.FC<Props> = ({ data, isLast }) => {
           </div>
         </div>
         <div className={message}>
+          <ImageModal
+            src={data.image}
+            isOpen={imageModalOpen}
+            onClose={() => setImageModalOpen(false)}
+          />
           {data.image ? (
             <Image
               src={data.image}
               alt="Image"
               height={288}
               width={288}
+              onClick={() => setImageModalOpen(true)}
               className="object-cover cursor-pointer hover:scale-110 transition translate"
             ></Image>
           ) : (
