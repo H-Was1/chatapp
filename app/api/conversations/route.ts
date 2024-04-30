@@ -15,7 +15,7 @@ export async function POST(req: Request) {
       return new NextResponse("Invalid data", { status: 400 });
     }
     if (isGroup) {
-      const newConversation = prisma?.conversation.create({
+      const newConversation = prismadb?.conversation.create({
         data: {
           name,
           isGroup,
