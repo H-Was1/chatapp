@@ -3,11 +3,15 @@ import useConversation from "@/hooks/use-conversation";
 import { fullConversationType } from "@/types";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { MdOutlineGroupAdd } from "react-icons/md";
 import ConversationBox from "./ConversationBox";
 import GroupChatModal from "./GroupChatModal";
 import { User } from "@prisma/client";
+import { useSession } from "next-auth/react";
+import { pusherClient } from "@/app/lib/pusher";
+import { find } from "lodash";
+import router from "next/router";
 
 interface ConversationListProps {
   initialItems: fullConversationType[];
@@ -20,8 +24,55 @@ const ConversationList: React.FC<ConversationListProps> = ({
 }) => {
   const [items, setItems] = useState(initialItems);
   const router = useRouter();
+  const session = useSession();
   const { conversationId, isOpen } = useConversation();
   const [IsModalOpen, setIsModalOpen] = useState(false);
+  const pusherKey = useMemo(() => {
+    return session.data?.user?.email;
+  }, [session.data?.user?.email]);
+  useEffect(() => {
+    const updateHandler = (conversation: fullConversationType) => {
+      setItems((current) =>
+        current.map((currentConversation) => {
+          if (currentConversation.id === conversation.id) {
+            return { ...currentConversation, messages: conversation.messages };
+          }
+          return currentConversation;
+        })
+      );
+    };
+
+    const newHandler = (conversation: fullConversationType) => {
+      setItems((current) => {
+        if ((find(current), { id: conversation.id })) {
+          return current;
+        }
+        return [conversation, ...current];
+      });
+      // router.refresh();
+    };
+    if (!pusherKey) {
+      return;
+    }
+    const removeHandler = (conversation: fullConversationType) => {
+      setItems((current) => {
+        return [...current.filter((item) => item.id !== conversation.id)];
+      });
+      conversationId === conversation.id && router.push("/conversations");
+    };
+
+    pusherClient.subscribe(pusherKey);
+    pusherClient.bind("conversation:new", newHandler);
+    pusherClient.bind("conversation:update", updateHandler);
+    pusherClient.bind("conversation:remove", removeHandler);
+
+    return () => {
+      pusherClient.unsubscribe(pusherKey);
+      pusherClient.unbind("conversation:new", newHandler);
+      pusherClient.unbind("conversation:update", updateHandler);
+      pusherClient.unbind("conversation:remove", removeHandler);
+    };
+  }, [conversationId, pusherKey, router]);
 
   return (
     <>
@@ -51,9 +102,6 @@ const ConversationList: React.FC<ConversationListProps> = ({
               key={item.id}
               data={item}
               selected={conversationId === item.id}
-              // onClick={() => {
-              //   router.push(`/messages/${item.id}`);
-              // }}
             ></ConversationBox>
           ))}
         </div>
