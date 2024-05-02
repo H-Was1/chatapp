@@ -24,7 +24,7 @@ const DesktopItem: React.FC<DesktopItemProps> = ({
     }
   };
   return (
-    <li onClick={handleClick}>
+    // <li onClick={handleClick}>
       <Link
         href={href}
         className={clsx(
@@ -37,7 +37,7 @@ const DesktopItem: React.FC<DesktopItemProps> = ({
         <Icon className="h-6 w-6 shrink-0" />
         <span className="sr-only">{label}</span>
       </Link>
-    </li>
+    {/* </li> */}
   );
 };
 
