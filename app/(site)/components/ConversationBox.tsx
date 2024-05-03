@@ -8,6 +8,7 @@ import clsx from "clsx";
 import Avatar from "./Avatar";
 import { format } from "date-fns";
 import AvatarGroup from "./AvatarGroup";
+import Link from "next/link";
 
 interface boxProps {
   data: fullConversationType;
@@ -53,7 +54,8 @@ const ConversationBox: React.FC<boxProps> = ({ data, selected }) => {
   }, [lastMessage]);
 
   return (
-    <div
+    <Link
+      href={`/conversations/${data.id}`}
       onClick={handleClick}
       className={clsx(
         "w-full relative flex items-center space-x-3 hover:bg-neutral-100 rounded-md transition cursor-pointer p-3 mb-1",
@@ -87,7 +89,7 @@ const ConversationBox: React.FC<boxProps> = ({ data, selected }) => {
           </p>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 
